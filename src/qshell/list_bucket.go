@@ -11,6 +11,10 @@ import (
 	"qiniu/rpc"
 )
 
+func ListBucket(mac *digest.Mac, bucket, prefix, marker, listResultFile string) (retErr error) {
+	return ListBucket2(mac, bucket, prefix, marker, listResultFile, "")
+}
+
 /*
 *@param bucket
 *@param prefix
@@ -18,7 +22,7 @@ import (
 *@param listResultFile
 *@return listError
  */
-func ListBucket(mac *digest.Mac, bucket, prefix, marker, listResultFile string) (retErr error) {
+func ListBucket2(mac *digest.Mac, bucket, prefix, marker, listResultFile string, domain string) (retErr error) {
 	var listResultFh *os.File
 	if listResultFile == "stdout" {
 		listResultFh = os.Stdout
@@ -83,8 +87,8 @@ func ListBucket(mac *digest.Mac, bucket, prefix, marker, listResultFile string) 
 
 		//append entries
 		for _, entry := range entries {
-			lineData := fmt.Sprintf("%s\t%d\t%s\t%d\t%s\t%d\t%s\r\n",
-				entry.Key, entry.Fsize, entry.Hash, entry.PutTime, entry.MimeType, entry.FileType, entry.EndUser)
+			lineData := fmt.Sprintf("http://%s/%s\n", domain,
+				entry.Key)
 			_, wErr := bWriter.WriteString(lineData)
 			if wErr != nil {
 				logs.Error("Write line data `%s` to list result file failed.", lineData)

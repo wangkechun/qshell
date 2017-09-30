@@ -96,7 +96,13 @@ func ListBucket(cmd string, params ...string) {
 			qshell.SetZone(bucketInfo.Region)
 		}
 
-		retErr := qshell.ListBucket(&mac, bucket, prefix, listMarker, listResultFile)
+		domain, err := qshell.GetDomainsOfBucket(&mac, bucket)
+		if err != nil {
+			fmt.Println(gErr)
+			os.Exit(qshell.STATUS_ERROR)
+		}
+		fmt.Println("use domain", domain[0])
+		retErr := qshell.ListBucket2(&mac, bucket, prefix, listMarker, listResultFile, domain[0])
 		if retErr != nil {
 			os.Exit(qshell.STATUS_ERROR)
 		}
